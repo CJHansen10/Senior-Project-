@@ -1,0 +1,28 @@
+CMSI 4071 Fall 2025
+Project Proposal Feedback
+Project: Unnamed fighting game
+=========================
+
+Proposal Document [3 points]:
+-----------------------------
+I don't see a proposal document in your repository, as is required by this
+deliverable assignment.  I can't evaluate what isn't there!  :D  Please make
+a document per the specifications and put it into your repository ASAP and
+the points for this will be restored.
+
+Proposal Presentation [2 points]:
+---------------------------------
+Your presentation was very good, met all the requirements as listed, and
+provided enough detail so the audience saw interested without having so
+much text that they couldn't read it all before the next slide appeared.
+I enjoyed the presentation and you answered questions well.  I like your
+graphics, and the slide background coloring is very eye-catching!
+
+Overall, very good!
+
+Summary:
+--------
+Nice job overall!  Keep up the good work.
+
+2 out of 5 which is not the best on this deliverable.  Make sure that you do
+the proposal document and commit that for restoration of points ASAP.
