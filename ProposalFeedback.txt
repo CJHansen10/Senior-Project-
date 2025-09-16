@@ -10,6 +10,33 @@ deliverable assignment.  I can't evaluate what isn't there!  :D  Please make
 a document per the specifications and put it into your repository ASAP and
 the points for this will be restored.
 
+RE-EVALUATED AFTER BEING INFORMED THAT DOCUMENT IS IN README FILE
+-----------------------------------------------------------------
+OK, sorry about that.
+
+The description of what you are planning is VERY VERY complete!  The team has
+obviously put a lot of thought into this project and you have a good listing
+and good descriptions of what the parts are and what you'll do with them.  I
+like the idea of pirates [ARGH!] and I think this well be fun for players to
+engage with.  You have listed several existing games as exemplars, which is
+good to give context to the reader.  You have also listed your long-term
+goals, so the reader knows the extended plan.  Very nice up to this point.
+
+However, you DON'T have the required 'justification' section.  This was part
+of the specification for the document.  It should explain why your team's
+choice of project is appropriate for this class.  The following criteria
+should be considered in writing the justification:
+  * The project applies and demonstrates what team members have learned in
+      other classes
+  * The project gives each team member the opportunity to extend what s/he
+      has learned in other classes
+  * The technical difficulty of the project is appropriate (not too easy,
+      not too difficult)
+  * One semester is a reasonable amount of time to develop the project
+  * The team as a whole possesses the tools required to complete the project
+  * The project is interesting to each teammate, classmates, and the instructor
+
+
 Proposal Presentation [2 points]:
 ---------------------------------
 Your presentation was very good, met all the requirements as listed, and
@@ -24,5 +51,4 @@ Summary:
 --------
 Nice job overall!  Keep up the good work.
 
-2 out of 5 which is not the best on this deliverable.  Make sure that you do
-the proposal document and commit that for restoration of points ASAP.
+4 out of 5 which is a B on this deliverable.
