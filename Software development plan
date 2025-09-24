@@ -17,9 +17,24 @@
 4.2-Project Resources Section
   We will be using unity and have a graphic designer and a few of us will also be using blender.
 4.2.1-Hardware Resources Section
-  
+  Development Hardware:
+- Windows Computer
+   Intel i5 CPU, 8GB RAM, SSD storage
+   Integrated graphics, Ethernet connection
+   USB 3.0 ports, dual monitor support
+- Graphics Tablet
+   Drawing surface to design new sprites
+Execution Hardware:
+- Windows Computer  
+  Dual-core CPU, 4GB RAM, integrated graphics
+  Ethernet connection
 4.2.2-Software Resources Section
-  
+- Unity LTS game engine
+- Visual Studio Community Edition IDE
+- Blender 3.6 for 3D modeling and animation
+- GIMP for 2D sprite editing and texture creation
+- Git version control system
+- GitHub Desktop for repository management
 4.3-Project Organization Section
   
 4.4-Schedule Section
