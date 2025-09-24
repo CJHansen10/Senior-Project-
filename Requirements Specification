@@ -1,3 +1,16 @@
+5. Requirements Specification (SRS)
+  5.1 System Overview (Intro, High-Level Diagram, Document Outline)
+  5.2 CSCI Component Breakdown
+  5.3 Functional Requirements
+      5.3.1 Graphical User Interface (UI & Menu CSC)
+      5.3.2 Gameplay (Gameplay CSC)
+      5.3.3 Content & Persistence (Content & Persistence CSC)
+  5.4 Performance Requirements
+  5.5 Environment Requirements
+
+
+
+
 5.0  Requirements Specification
                5.1      Introduction
                   Pirate Fighters is a 2D, controller-friendly pirate fighting game designed for accessibility and quick fun, even for players who don’t typically game. 
@@ -6,18 +19,382 @@
                   The target execution platform is Windows PCs that meet the listed minimums. Implementation details, user stories, and operational context are deferred to the ConOps and companion documents; 
                   this section only frames the system and its components.
                5.2.     CSCI Component Breakdown
+
+                   5.2.1   UI & Menu CSC — Unity-based UI that presents the title/menu flow, login/logout, and in-game HUD.
+                           Handles navigation, theming, and accessibility for quick, beginner-friendly play.
+                
+                   5.2.1.1 Main Menu CSU — Entry screen: Play, Character Select, Map Select, Settings, and Quit.
+                           - 5.2.1.1.1 MenuController module — Orchestrates screen flow and button actions.
+                           - 5.2.1.1.2 GUIButton module — Reusable button widget with hover/click states and async feedback.
+                           - 5.2.1.1.3 ThemePalette module — Centralized color/typography (supports light/dark, high contrast).
+                
+                   5.2.1.2 Login & Profile CSU — Simple local login/logout and profile switching (name, avatar, preferences).
+                           - 5.2.1.2.1 LoginPanel module — Captures player identity and handles session start/end.
+                           - 5.2.1.2.2 ProfileStore module — Reads/writes local profile data (no network dependency).
+                           - 5.2.1.2.3 SettingsPanel module — Audio levels, control mappings, accessibility toggles.
+                
+                   5.2.1.3 In-Game HUD CSU — Displays health bars, round timer, score, and special-move meter.
+                           - 5.2.1.3.1 HealthBar module — Binds to character health and plays hit/low-health cues.
+                           - 5.2.1.3.2 MeterDisplay module — Tracks/animates special-move charge.
+                           - 5.2.1.3.3 PauseOverlay module — Pause/resume and options during a match.
+                
+                
+                   5.2.2   Gameplay CSC — Core game loop and rules for a 2D fighting experience: movement, combat,
+                           blocking, jumping, special moves, round/timer, win conditions.
+                
+                   5.2.2.1 Player Controller CSU — Character control for human players (keyboard/controller).
+                           - 5.2.2.1.1 Movement2D module — Walk/run, jump, coyote time, air control.
+                           - 5.2.2.1.2 Combat module — Light/heavy attacks, combos, hit detection, stun windows.
+                           - 5.2.2.1.3 BlockParry module — Hold-to-block, perfect-parry timing, chip damage rules.
+                           - 5.2.2.1.4 SpecialMove module — Triggers character-specific special; manages cooldown/cost.
+                           - 5.2.2.1.5 AnimState module — State machine linking inputs to sprites/animations.
+                
+                   5.2.2.3 Match System CSU — Rounds, timer, scoring, and victory conditions.
+                           - 5.2.2.3.1 RoundManager module — Starts/stops rounds, handles KO and rematch flow.
+                           - 5.2.2.3.2 DamageRules module — Applies damage, knockback, invulnerability frames.
+                           - 5.2.2.3.3 SpawnPoints module — Places fighters at map-defined start positions.
+                
+                   5.2.2.4 Map Manager CSU — Loads and transitions between 2D arenas/maps.
+                           - 5.2.2.4.1 MapLoader module — Asynchronous scene/asset loading for selected arena.
+                           - 5.2.2.4.2 HazardSystem module — Optional per-map hazards (e.g., spikes, moving platforms).
+                           - 5.2.2.4.3 Parallax module — Background layers/parallax for visual depth.
+                
+                   5.2.2.5 Input System CSU — Device detection and input mapping.
+                           - 5.2.2.5.1 InputMapper module — Binds actions (move/block/jump/attack/special) to keys/buttons.
+                           - 5.2.2.5.2 ControllerDetect module — Hot-plug detection, per-player device assignment.
+                
+                   5.2.2.6 Audio & VFX CSU — Feels-good feedback for hits, specials, UI, and ambience.
+                           - 5.2.2.6.1 AudioMixer module — Master/music/SFX buses; saves user volume settings.
+                           - 5.2.2.6.2 SFXPlayer module — Plays contextual sounds (hit, block, KO, menu).
+                           - 5.2.2.6.3 VFXPlayer module — Particles, hit flashes, screen shake, and impact trails.
+                
+                
+                   5.2.3   Content & Persistence CSC — Asset pipeline and local data storage to support production and play.
+                
+                   5.2.3.1 Asset Library CSU — Characters, sprites, animations, maps, UI art, and audio content.
+                           - 5.2.3.1.1 SpriteSet module — Character sprite atlases and animation clips.
+                           - 5.2.3.1.2 MapTileset module — Tiles/backgrounds/colliders for arenas.
+                           - 5.2.3.1.3 AudioBank module — Organized SFX and music tracks.
+                
+                   5.2.3.2 Save & Settings CSU — Local persistence for profiles and options (no external services).
+                           - 5.2.3.2.1 SaveSerializer module — JSON/binary serialization for options and profiles.
+                           - 5.2.3.2.2 DataPath module — Resolves platform-appropriate save paths on Windows.
+                
+                   5.2.3.3 Build & Tooling CSU — Project configuration for Unity LTS, Git/GitHub, and CI-ready builds.
+                           - 5.2.3.3.1 BuildConfig module — Target platform settings (Windows), versioning, compression.
+                           - 5.2.3.3.2 ImportSettings module — Unity import presets for sprites/audio.
+                           - 5.2.3.3.3 DevHooks module — Pre-commit checks (asset GUIDs, meta files, naming).
+
                5.3      Functional Requirements by CSC
-               5.3.1    Functional Requirement 1
-                             .
-                             .
-                             .
-               5.3.n    Functional Requirement n
-               5.4      Performance Requirements by CSC
-               5.4.1    Performance Requirement 1
-                             .
-                             .
-                             .
-               5.4.n    Performance Requirement n
+                    This section describes the externally observable capabilities of Pirate Fighters once completed. The system will allow players to start and configure matches, 
+                    select pirates and arenas, play 2D fighting rounds with movement, combat, blocking, jumping, and character-specific special moves, view scores and results, 
+                    and manage simple local profiles and settings. Features are organized by the system’s major parts (CSCs) to present a functional decomposition. Implementation mechanisms, 
+                    algorithms, data models, and UI layouts are deferred to other documents (e.g., ConOps, design specs).
+
+                    The rest of this section is divided into subsections that correspond to the CSCs defined previously: UI & Menu, Gameplay, and Content & Persistence. 
+                    Each subsection is grouped by related functional requirements, and each requirement is given a meaningful, descriptive name.
+
+                    FR-UI-1 Start Match
+                    The system shall allow the player to start a new match from the main menu.
+                    
+                    FR-UI-2 Character Selection
+                    The system shall allow players to choose a pirate character before a match.
+                    
+                    FR-UI-3 Map Selection
+                    The system shall allow players to choose from the available 2D arenas/maps.
+                    
+                    FR-UI-4 Settings Management
+                    The system shall allow players to adjust audio levels and control mappings.
+                    
+                    FR-UI-5 Accessibility Modes
+                    The system shall provide basic accessibility options (e.g., readable UI themes).
+                    
+                    FR-UI-6 Local Login/Logout
+                    The system shall support simple local login/logout and profile switching.
+                    
+                    FR-UI-7 In-Game HUD
+                    During a match, the system shall display health, timer, score/rounds, and special-move meter.
+                    
+                    FR-UI-8 Pause & Resume
+                    During a match, the system shall allow pausing and resuming, including returning to the main menu.
+                    
+                    FR-GP-1 Player Movement
+                    The system shall allow a player-controlled character to move horizontally and jump within an arena.
+                    
+                    FR-GP-2 Combat Actions
+                    The system shall allow characters to perform attacks that can damage opponents and affect their state.
+                    
+                    FR-GP-3 Blocking & Defense
+                    The system shall allow characters to block incoming attacks with rules for damage mitigation.
+                    
+                    FR-GP-4 Special Moves
+                    The system shall provide a character-specific special move that becomes available under defined conditions.
+                    
+                    FR-GP-5 Hit & KO Resolution
+                    The system shall determine hits, reduce health accordingly, and declare a KO when health is depleted.
+                    
+                    FR-GP-6 Round & Match Rules
+                    The system shall run time-bounded rounds, track round wins, and declare a match winner based on configured win conditions.
+                    
+                    FR-GP-7 Arena Usage
+                    FR-CP-1 Character Roster Availability
+                    The system shall provide a roster of selectable pirate characters for matches.
+                    
+                    FR-CP-2 Arena Availability
+                    The system shall provide multiple selectable arenas/maps for matches.
+                    
+                    FR-CP-3 Local Profile Storage
+                    The system shall store and retrieve local player profiles, including selected preferences.
+                    
+                    FR-CP-4 Settings Persistence
+                    The system shall persist audio and control settings across sessions.
+                    The system shall load the selected arena and apply its spatial boundaries and interactable features.
+               5.3    Functional Requirement 1
+
+                    This section describes the features the completed Pirate Fighters system will provide. The system will let players start and configure matches, select pirate characters and arenas, play 2D fighting rounds featuring movement, combat, blocking, jumping, and character-specific special moves, view scores and results, and manage simple local profiles and settings. Functional capabilities are organized by the major parts (CSCs) defined previously to show the functional decomposition of the system.
+                    
+                    Implementation mechanisms, internal data structures, and algorithms are intentionally excluded here and will be documented in the ConOps and design specifications. The rest of this section is divided into subsections—one per CSC—with requirement groups and individually numbered shall statements.
+                    
+                    5.3.1 Graphical User Interface (UI & Menu CSC)
+                    
+                    Brief description (what it will do):
+                    The UI will provide an entry point to begin play, select characters and arenas, manage profiles, and adjust settings. During matches it will present an in-game HUD with health, 
+                    timer, rounds, and special-move meter, and it will support pausing and resuming play.
+                    
+                    Requirements (UI)
+                    
+                    5.3.1.1 The system shall display a main menu for the application.
+                    
+                    5.3.1.2 The system shall provide menu options to start a match, open character selection, open arena selection, open settings, and exit.
+                    
+                    5.3.1.3 The system shall present a character selection screen where the player can choose a pirate character.
+                    
+                    5.3.1.4 The system shall present an arena selection screen where the player can choose from available arenas.
+                    
+                    5.3.1.5 The system shall provide a settings screen to adjust audio levels and control mappings.
+                    
+                    5.3.1.6 The system shall support local login/logout and profile selection from the main menu.
+                    
+                    5.3.1.7 The system shall display an in-game HUD showing each fighter’s health, the round timer, current round count, and special-move meter.
+                    
+                    5.3.1.8 The system shall provide a pause screen during a match with options to resume, restart, open settings, and return to the main menu.
+                    
+                    5.3.1.9 The system shall provide on-screen notifications for match start, KO events, round transitions, and match results.
+                    
+                    5.3.1.10 The system shall provide basic accessibility options, including readable UI themes and legible text sizes.
+                    
+                    5.3.1.11 The system shall provide input feedback on UI elements (e.g., focus/selection state) when navigated by keyboard or controller.
+                    
+                    5.3.1.12 The system shall present an end-of-match results screen summarizing winner, rounds won, and time remaining.
+                    
+                    5.3.2 Gameplay (Gameplay CSC)
+                    
+                    Brief description (what it will do):
+                    Gameplay will enable players to control characters in a 2D arena match. Characters will be able to move, jump, attack, block, and perform a character-specific special move. 
+                    The system will run rounds with a timer, apply damage and KO rules, and determine match winners.
+                    
+                    Requirements (Gameplay)
+                    
+                    5.3.2.1 The system shall allow player-controlled characters to move horizontally within the arena boundaries.
+                    
+                    5.3.2.2 The system shall allow characters to jump.
+                    
+                    5.3.2.3 The system shall allow characters to perform attacks that can reduce an opponent’s health.
+                    
+                    5.3.2.4 The system shall allow characters to block incoming attacks according to defined blocking rules.
+                    
+                    5.3.2.5 The system shall provide a character-specific special move for each character.
+                    
+                    5.3.2.6 The system shall apply hit resolution that determines when an attack connects and how much health is reduced.
+                    
+                    5.3.2.7 The system shall declare a KO when a character’s health is reduced to zero.
+                    
+                    5.3.2.8 The system shall conduct time-bounded rounds.
+                    
+                    5.3.2.9 The system shall track round wins and determine the match winner based on configured win conditions.
+                    
+                    5.3.2.10 The system shall allow a single-player match against a computer-controlled opponent.
+                    
+                    5.3.2.11 The system shall load the selected arena and enforce its spatial boundaries.
+                    
+                    5.3.2.12 The system shall place fighters at designated starting positions at the beginning of each round.
+                    
+                    5.3.2.13 The system shall reset health, meters, and positions between rounds per the configured rules.
+                    
+                    5.3.2.14 The system shall record match outcomes (winner and rounds) for presentation on the results screen.
+                    
+                    5.3.3 Content & Persistence (Content & Persistence CSC)
+                    
+                    Brief description (what it will do):
+                    Content & Persistence will make characters, arenas, and audio/visual assets available to the game experience and will preserve local player preferences and profiles across sessions.
+                    
+                    Requirements (Content & Persistence)
+                    
+                    5.3.3.1 The system shall provide a roster of selectable pirate characters.
+                    
+                    5.3.3.2 The system shall provide multiple selectable arenas.
+                    
+                    5.3.3.3 The system shall store local player profiles containing name, avatar, and preferences.
+                    
+                    5.3.3.4 The system shall persist audio settings across sessions.
+                    
+                    5.3.3.5 The system shall persist control mappings across sessions.
+                    
+                    5.3.3.6 The system shall preserve the most recent character and arena selections for convenience.
+                    
+                    5.3.3.7 The system shall provide localized storage of match configuration sufficient to resume standard play settings in a subsequent session.
+                    
+                    5.3.3.8 The system shall make available the art, animation, and audio assets required for the UI and gameplay features defined in Sections 5.3.1 and 5.3.2.
+               5.4    Performance Requirements
+                    This section specifies quantitative performance targets for the completed system. It describes what levels of performance the player can expect (e.g., responsiveness, load times, memory/disk usage), not how they are achieved. Unless otherwise stated, all timings are measured as user-perceived wall-clock time on the target execution hardware (see §4.2.1).
+                    
+                    5.4.1 Consistent 60 FPS Gameplay
+                    
+                    Description: During active matches, play should feel smooth and visually stable.
+                    Requirement: The system shall sustain an average of 60 frames per second during matches, with no frame-time spikes exceeding 33 ms for more than 1% of frames in any 5-minute interval.
+                    
+                    5.4.2 Low Input-to-Action Latency
+                    
+                    Description: Player inputs must translate quickly to on-screen actions.
+                    Requirement: The end-to-end input latency (controller/keyboard actuation to on-screen character response) shall be ≤ 100 ms during matches.
+                    
+                    5.4.3 Fast Startup to Main Menu
+                    
+                    Description: Players should reach the main menu quickly from a cold start.
+                    Requirement: From application launch, the main menu shall appear within ≤ 5 s on cold start and ≤ 3 s on warm start.
+                    
+                    5.4.4 Quick Arena Load
+                    
+                    Description: Transitioning from menu/selection to an arena should be snappy.
+                    Requirement: Loading a selected arena to the “Ready” state shall complete within ≤ 4 s.
+                    
+                    5.4.5 Immediate Pause/Resume
+                    
+                    Description: Pausing and resuming must feel instantaneous during play.
+                    Requirement: Entering or exiting pause shall complete within ≤ 250 ms.
+                    
+                    5.4.6 Prompt Match Start
+                    
+                    Description: After an arena is loaded, the match should begin without delay.
+                    Requirement: The system shall present the match countdown and accept player control within ≤ 2 s of arena load completion.
+                    
+                    5.4.7 Responsive UI Navigation
+                    
+                    Description: Menus and in-game UI should react immediately to user actions.
+                    Requirement: UI focus changes and button activations shall respond within ≤ 100 ms; full-screen menu transitions shall complete within ≤ 400 ms.
+                    
+                    5.4.8 Save & Settings Persistence Speed
+                    
+                    Description: Saving should not interrupt flow.
+                    Requirement: Writing player settings or profiles shall complete within ≤ 200 ms and shall not block gameplay during a match.
+                    
+                    5.4.9 Memory Footprint Limits
+                    
+                    Description: The game must run comfortably on the specified hardware.
+                    Requirement: The average working-set memory shall be ≤ 800 MB, with peak ≤ 1.2 GB during arena loads.
+                    
+                    5.4.10 Install/Storage Size
+                    
+                    Description: Disk usage should remain modest for easy installation.
+                    Requirement: The installed game footprint (excluding user data) shall be ≤ 1.5 GB.
+                    
+                    5.4.11 Audio Event Latency
+                    
+                    Description: Sounds should closely match on-screen actions.
+                    Requirement: The latency from a gameplay event (e.g., hit, block) to audible playback shall be ≤ 100 ms under normal load, with no audible stutter.
+                    
+                    5.4.12 Controller Hot-Plug Recognition
+                    
+                    Description: Newly connected controllers should be recognized quickly.
+                    Requirement: A newly connected controller shall be recognized and usable within ≤ 3 s without requiring application restart.
+                    
+                    
+                    5.4.13 Simulation Frame Budget
+                    
+                    Description: Core simulation needs to fit within the frame time.
+                    Requirement: The per-frame simulation update during active matches shall complete within ≤ 16.7 ms for 95% of frames.
+                    
+                    5.4.14 Stability Under Extended Play
+                    
+                    Description: Long play sessions should remain smooth and stable.
+                    Requirement: Over 2 continuous hours of play, the system shall exhibit no crashes and no progressive frame-time degradation exceeding the limits stated in §5.4.1.
+                    
                5.5      Project Environment Requirements
-               5.5.1    Development Environment Requirements
-               5.5.2    Execution Environment Requirements
+                    This section lists the software, hardware, and other resources required to develop and to deploy/execute the completed system. Where a resource is unusual, a short justification is provided. If a resource is not currently available, steps to acquire it are noted. (These may overlap with the SDP; treat the SRS values here as the current, finalized targets and iterate as needed.)
+
+                    5.5.1 Development Environment Requirements
+                    
+                    Hardware
+                    
+                    Category	Requirement
+                    Processor	Intel Core i5 (or AMD equivalent)
+                    RAM	8 GB minimum (16 GB recommended for smoother editor use)
+                    Storage	SSD with ≥ 20 GB free (project, cache, builds)
+                    Graphics	Integrated GPU acceptable; discrete GPU recommended for faster playtesting
+                    Display	Dual-monitor support recommended; 1080p or higher
+                    Peripherals	Keyboard/mouse; Graphics tablet (optional) for art; Game controller (optional) for input testing
+                    Networking	Ethernet or stable Wi-Fi for version control
+                    
+                    Software
+                    
+                    Category	Requirement
+                    OS	Windows 10/11 (64-bit)
+                    Game Engine	Unity LTS (final LTS version selected for the project)
+                    IDE	Visual Studio Community Edition (with C# tooling)
+                    Art Tools	GIMP (2D sprites/textures); Blender 3.6 (animation/asset prep, even for 2D pipelines)
+                    Version Control	Git + GitHub Desktop
+                    Audio (Optional)	Any WAV/OGG editor (e.g., Audacity) for trimming/normalizing
+                    
+                    Unusual/Notable Dev Resources & Justification
+                    
+                    Graphics Tablet (optional): Improves precision and speed when hand-drawing sprites and effects; non-blocking if unavailable (mouse workflows allowed).
+                    
+                    Blender 3.6: Although the game is 2D, Blender accelerates animation prototyping, camera tests, and asset pipelines (e.g., rendering 2D frames from 3D mockups) before exporting to sprite sheets.
+                    
+                    Acquisition Steps (if missing)
+                    
+                    Unity LTS, Visual Studio Community, GitHub Desktop, GIMP, and Blender are free—team will install from official sources and document versions in the repo README.
+                    
+                    One shared graphics tablet will be checked out from the lab or purchased within the art tools budget if not on hand.
+                    
+                    Game controllers (e.g., Xbox) will be supplied by team members or borrowed from the lab for input testing.
+                    
+                    5.5.2 Deployment / Execution Environment Requirements
+                    
+                    Target Hardware (Minimum)
+                    
+                    Category	Requirement
+                    Processor	Dual-core CPU
+                    RAM	4 GB
+                    Storage	≥ 1.5 GB free for install (excludes user data)
+                    Graphics	Integrated graphics
+                    Display	1920×1080 @ 60 Hz
+                    Audio	Integrated audio
+                    Networking	Not required for offline play
+                    
+                    Target Software
+                    
+                    Category	Requirement
+                    OS	Windows 10/11 (64-bit)
+                    Runtimes	Included with Unity build (no separate installs expected)
+                    Input	Keyboard/mouse; Game controller (optional but recommended)
+                    
+                    Notes
+                    
+                    Display and performance targets (e.g., 60 FPS at 1080p) are specified in §5.4 Performance Requirements.
+                    
+                    Controllers are optional for players but recommended for best experience (fighting-game ergonomics).
+                    
+                    5.5.3 Other Environment Considerations
+                    
+                    Disk Footprint: Installed game ≤ 1.5 GB (see §5.4.10).
+                    
+                    Accessibility: High-contrast UI themes and legible sizing are part of functional requirements (§5.3.1).
+                    
+                    Offline Operation: No network dependency for core gameplay; all profiles/settings stored locally.
+                    
+                    5.5.4 Traceability & Iteration
+                    
+                    These environment requirements will be revisited if engine version changes, asset scope expands, or performance targets are adjusted.
+                    Requirement IDs in §§5.3–5.4 guide corresponding test cases and build validation.
+
