@@ -1,1 +1,23 @@
-
+5.0  Requirements Specification
+               5.1      Introduction
+                  Pirate Fighters is a 2D, controller-friendly pirate fighting game designed for accessibility and quick fun, even for players who don’t typically game. 
+                  At a high level, the system centers on a Unity client that delivers core features—a Title/Menu with login/logout, character movement/combat/block/jump, multiple arena maps, special-move logic, 
+                  audio/FX, and local save/profile management—fed by an asset pipeline (Blender + GIMP) and supported by standard dev tooling (Visual Studio, Git/GitHub). 
+                  The target execution platform is Windows PCs that meet the listed minimums. Implementation details, user stories, and operational context are deferred to the ConOps and companion documents; 
+                  this section only frames the system and its components.
+               5.2.     CSCI Component Breakdown
+               5.3      Functional Requirements by CSC
+               5.3.1    Functional Requirement 1
+                             .
+                             .
+                             .
+               5.3.n    Functional Requirement n
+               5.4      Performance Requirements by CSC
+               5.4.1    Performance Requirement 1
+                             .
+                             .
+                             .
+               5.4.n    Performance Requirement n
+               5.5      Project Environment Requirements
+               5.5.1    Development Environment Requirements
+               5.5.2    Execution Environment Requirements
