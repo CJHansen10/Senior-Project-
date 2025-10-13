@@ -1,0 +1,98 @@
+
+Essay Feedback
+Homework Assignment #1
+CMSI 4071 Fall 2025
+======================
+
+NOTE:  THIS WAS A GROUP ASSIGNMENT, FOR WHICH YOU SHOULD ALL HAVE BEEN
+   TOGETHER TO READ AND THEN DISCUSS THE ARTICLE.  REMEMBER THAT YOU COULD
+   HAVE PICKED ANY ARTICLE YOU LIKED TO USE FOR THE ASSIGNMENT.  I PICKED
+   ONE ENTRY TO EVALUATE AND DID NOT PROVIDE EVALUATIONS FOR ALL FOUR OF
+   THE SUBMISSIONS.  I TRIED TO PICK THE 'BEST' OF THE FOUR SO THAT YOUR
+   GROUP SCORE WOULD BE THE HIGHEST.  I THINK IT WAS OK THIS WAY SINCE YOU
+   GOT 100%....
+
+   I DO APPRECIATE THAT YOU ALL DID THE WORK ON THIS ASSIGNMENT, AND THE
+   ESSAYS ARE ALL GOOD, SO IT WAS DIFFICULT TO PICK JUST ONE TO DO THE
+   EVALUATION.
+
+SUMMARY:
+The essay provides a clear and accurate summary of the ValuJet Flight 592
+crash, including the timeline, technical cause (improperly stored oxygen
+generators), and the systemic failures that led to the disaster.
+
+The essay effectively explains the concept of a "system accident" and how
+the crash resulted from a chain of small, interconnected failures. It
+highlights the roles of SabreTech, ValuJet, and the FAA.
+
+The essay includes specific and relevant details, such as the missing
+safety caps, mislabeling of hazardous materials, and the lack of fire
+suppression systems.
+
+The writing is clear, well-organized, and logically structured. The
+narrative flows smoothly from the incident to the broader systemic issues.
+
+The essay reflects on the broader implications of the crash, particularly
+the dangers of diffused responsibility and the limitations of regulatory
+oversight in complex systems.
+
+Overall: The synopsis is comprehensive, well-supported, and critically
+engaged, effectively capturing the article’s key arguments and deeper
+insights.
+
+CRITICAL THINKING:
+The essay draws strong and relevant parallels between the ValuJet disaster
+and software engineering, especially in areas like system complexity,
+third-party dependencies, and organizational responsibility.
+
+The essay insightfully connects the ValuJet case to software engineering
+challenges, such as ambiguous ownership, communication breakdowns, and the
+risks of cutting corners under pressure.
+
+The essay references key practices such as defense-in-depth, layered
+validation, monitoring, clear ownership, and cross-team communication. It
+also emphasizes the importance of prioritizing safety over speed.
+
+The examples are grounded in real-world software development scenarios. The
+recommendations are practical and align with industry best practices.
+
+The writing is articulate and logically structured. Each point is
+well-developed and transitions smoothly into the next. The tone is
+professional and reflective.
+
+Overall: The application to software engineering is thoughtful, technically
+grounded, and highly relevant, demonstrating a strong understanding of how
+systemic failures in aviation can inform better practices in software
+development.
+
+OVERALL ASSESSMENT:
+   Category                          Points
+   Summary of article                  25
+   Relation to S/W engineering         25
+   Thoughts/opinions presented         25
+   Spelling/Grammar                    25
+                                     -----
+   Subtotal                           100
+   ------------------------------------------------------
+   Total Percentage:   100 out of 100 which is an A-plus
+
+This essay is a well-structured and insightful analysis that effectively
+connects the ValuJet Flight 592 disaster to software engineering. It
+demonstrates a strong grasp of systemic risk, the importance of clear
+ownership and communication, and the need for robust safety practices in
+complex systems.
+
+Strengths:
+Accurate and detailed summary of the article.
+Strong analogies between aviation and software engineering.
+Emphasis on observability, safety protocols, and organizational
+   responsibility.
+Clear writing and logical structure.
+
+Suggestions for Improvement:
+A brief concluding paragraph summarizing the key takeaways from both
+   sections would enhance cohesion.
+Including a real-world software failure (e.g., the Boeing 737 MAX MCAS
+   issue or the Knight Capital glitch) could further strengthen the application
+   section.
+

@@ -1,0 +1,117 @@
+
+Documentation Feedback ~ Deliverable #2
+Software Requirements Specification
+Initial Development Schedule
+CMSI 4071 Fall 2025
+=======================================
+
+COMPONENT BREAKDOWN:
+====================
+Very nice introduction and great work on the CSCI breakdown section.  Just
+the right amount of detail there for someone at management level to get the
+idea of your application without having to dig through details.
+
+FUNCTIONAL REQUIREMENTS:
+========================
+Strengths:
+   Clear decomposition by CSC: UI & Menu, Gameplay, and Content &
+      Persistence are well-defined.
+   Detailed feature coverage:
+      UI: Main menu, character and map selection, settings, HUD,
+         pause/resume, accessibility options.
+      Gameplay: Movement, combat, blocking, special moves, KO logic,
+         round/match rules, arena loading.
+      Content & Persistence: Character roster, arenas, local profiles,
+         settings persistence, asset availability.
+      Accessibility: Includes basic accessibility options (readable themes,
+         legible text sizes).
+      Traceability: Requirements are structured with IDs and grouped
+         logically for testing.
+
+Gaps / Suggestions:
+   Error handling: No explicit requirements for invalid inputs, corrupted
+      save files, or failed asset loads.
+   Multiplayer support: Requirements assume single-player vs AI; no mention
+      of future scalability for multiplayer.
+   Security: No mention of protecting local data from tampering.
+   Notifications: Limited to match events; lacks functional requirements
+      for alerts or onboarding guidance.
+   Customization: No requirements for user-defined key bindings beyond
+      basic control mapping.
+
+PERFORMANCE REQUIREMENTS:
+=========================
+Strengths:
+   Quantifiable metrics provided:
+      Frame rate: 60 FPS with frame-time limits.
+      Input latency: =100 ms.
+      Startup and load times: =5 s for main menu, =4 s for arena load.
+      Pause/resume: =250 ms.
+   Memory footprint: =800 MB average, =1.2 GB peak.
+   Disk size: =1.5 GB.
+   Extended play stability: Specifies no crashes or frame degradation
+      over 2 hours.
+   Responsiveness: UI navigation and audio latency targets included.
+
+Gaps / Suggestions:
+   Stress/load testing: No requirements for performance under heavy asset
+      usage or extended sessions beyond 2 hours.
+   Network considerations: Offline mode is noted, but no metrics for
+      potential online features.
+   Recovery performance: Missing time limits for restoring state after
+      crashes.
+   Mobile optimization: Targets only Windows PCs; no mention of
+      portability.
+
+ENVIRONMENT REQUIREMENTS:
+=========================
+Strengths:
+   Development environment: Hardware (CPU, RAM, GPU), software stack
+      (Unity LTS, Visual Studio, GitHub), art tools (GIMP, Blender),
+      and version control are clearly listed.
+   Execution environment: Minimum hardware specs (dual-core CPU, 4 GB RAM,
+      integrated graphics), OS (Windows 10/11), and input devices.
+   Additional considerations: Accessibility, offline operation, and disk
+      footprint are addressed.
+
+Gaps / Suggestions:
+   Testing environment: No explicit requirements for automated testing
+      tools or QA processes.
+   Security environment: No mention of secure coding practices or runtime
+      integrity checks.
+   Monitoring and logging: No requirements for error tracking or analytics.
+   Future scalability: No guidance for supporting other platforms or higher
+      resolutions.
+
+
+OVERALL ASSESSMENT:
+   Category                          Points
+   Component Breakdown                 1/1
+   Functional Requirements             4/4
+   Performance Requirements            2/2
+   Environment Requirements            1/1
+                                     =====
+   Subtotal                            8/8
+   Preliminary Schedule                2/2   Gantt chart is a bit sparse
+   ------------------------------------------------------
+   Total Percentage:   10/10 = 100% which is an A-plus
+
+Overall Assessment
+   Functional requirements: Strong coverage of core gameplay and UI, but
+      missing error handling, security, multiplayer extensibility, and
+      advanced customization.
+   Performance requirements: Well-defined and measurable, but lacks
+      stress/load testing and recovery metrics.
+   Environmental requirements: Adequate for development and execution
+      basics, but missing testing, security, and monitoring details.
+   Your Gantt chart schedule is a bit sparse, so for the next iteration
+      you should try to put more of the tasks in there and give a little
+      better idea of how long each one will take.  Also, the flow should
+      be from top to bottom as you move through the tasks ~ you have them
+      bottom to top.
+
+
+Make sure you incorporate all the suggestions into the document by the end
+of the semester for full credit on this deliverable.
+
+Very good job on this deliverable.
