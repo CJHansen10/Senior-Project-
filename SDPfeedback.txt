@@ -6,36 +6,86 @@ CMSI 4071 Fall 2025
 
 INTRODUCTION/DELIVERABLES SECTION:
 ----------------------------------
-Not done for evaluation 2025-10-18
+Strengths:
+   The project goal is clearly stated: a 2D pirate fighting game.
+   The motivation is personal and engaging, which helps contextualize the
+      project.
+   A high-level timeline is provided, showing progressive development
+      milestones.
+Suggestions:
+   Waterfall Alignment: The waterfall model emphasizes distinct, sequential
+      phases. Consider explicitly naming phases like Requirements, Design,
+         Implementation, Testing, and Deployment.
+   Clarity: The timeline is helpful but could benefit from clearer
+      formatting and more formal language.
+   Scope Definition: Include a brief description of the game’s core features
+      and intended audience to better define the scope.
 
 
 PROJECT RESOURCES SECTION:
 ----------------------------------
-Not done for evaluation 2025-10-18
+Section 4.2.1 – Hardware Resources
+   Strengths:
+      Differentiates between development and execution hardware.
+      Provides specific specs for machines and peripherals.
+   Suggestions:
+      Completeness: Include backup or contingency plans if hardware fails.
+      Testing Hardware: Specify if testing will be done on different
+         configurations to ensure compatibility.
+Section 4.2.2 – Software Resources
+   Strengths:
+      Comprehensive list of software tools.
+      Includes version numbers and purpose (e.g., Blender for animation,
+         GIMP for sprites).
+   Suggestions:
+      Licensing: Mention whether tools are open-source or licensed, and how
+         licensing is managed.
+      Integration: Describe how these tools integrate into the development
+         pipeline (e.g., Unity + Blender workflow).
 
 
 PROJECT ORGANIZATION SECTION:
 ----------------------------------
-Not done for evaluation 2025-10-18
+Strengths:
+   Team collaboration is emphasized.
+   Weekly meetings show commitment to communication and progress tracking.
+Suggestions:
+   Waterfall Structure: Waterfall typically involves fixed roles and
+      responsibilities. Consider defining roles (e.g., Lead Developer,
+         Artist, QA).
+   Accountability: Specify how tasks are assigned and tracked—are there
+      task boards, version control logs, etc.?
+   Risk Management: Include how issues or delays are escalated and resolved.
 
 
 PROJECT SCHEDULE SECTION:
 ----------------------------------
-Not done for evaluation 2025-10-18
+Strengths:
+   Reiterates the timeline from earlier sections.
+   Shows a clear progression from UI to gameplay to polish.
+Suggestions:
+   Phase Mapping: Align schedule with waterfall phases
+      (e.g., Week 1–3: Requirements, Week 4–6: Design).
+   Milestone Criteria: Define what constitutes completion for each milestone.
+   Contingency Time: Include buffer time for unexpected delays.
+   Your Gantt chart schedule is a bit sparse, so for the next iteration you
+   should try to put more of the tasks in there and give a little better
+   idea of how long each one will take.  Also, the flow should be from top
+   to bottom as you move through the tasks ~ you have them bottom to top.
+
 
 
 OVERALL ASSESSMENT:
 ----------------------------------
    Category                          Points
-   Project Deliverables                0
-   Project Resources                   0
-   Project Organization                0
-   Project Schedule                    0
+   Project Deliverables                1
+   Project Resources                   1
+   Project Organization                1
+   Project Schedule                    2
                                      =====
-   Subtotal                            0
+   Subtotal                            5
    ------------------------------------------------------
-   Total Percentage:   0/5 = 0% which is an F on this deliverable
+   Total Percentage:   5/5 = 100% which is an A-plus on this deliverable.
 
-You still have another shot at this if you want.  Make an SDP and a final
-schedule by the end of the semester and you'll still get partial credit
-for this first submission.
+Sorry I didn't see this previously.  Sorry for any confusion!
+
