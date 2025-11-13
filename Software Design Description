@@ -1,0 +1,882 @@
+<b>6.1. Introduction<b>
+
+This document presents the architecture and detailed design for the software of Pirate Fighterz, a 2D local-multiplayer arena brawler built in Unity. 
+Players control pixel-art pirate sea creatures (e.g., Octopus, Crab, Shark, Turtle, Starfish, Jellyfish) and battle on simple stages using movement, jumping, and light/heavy attacks. 
+The game targets Windows/Mac/Linux and supports keyboard and Xbox-style controllers via Unity’s Input System.
+
+The design focuses on the core game loop and player experience: a Main Menu → Player Count (enforce 2 players for now; scalable to 6) → Character Select → Game scene flow; 
+per-player input using PlayerInput/PlayerInputManager with control schemes; character controllers with grounded movement and jump physics; a lightweight combat layer 
+(sprite-swap attacks and cooldowns); and UI with TMP and controller navigation. Shared state (e.g., player count, selections) is managed through a small GameState module, 
+and scene transitions through a SceneLoader utility.
+
+Out of scope for this iteration are networking, advanced AI, complex hitboxes/combos, and full VFX/audio pipelines.
+The goal of this document is to specify the software structure, key components, and interactions needed to deliver a stable two-player 
+prototype that can be extended to additional characters, inputs, and features.
+
+<b>6.1.1. System Objectives Section<b>
+
+Goals & Scope (Brief Recap)
+
+Primary objectives
+
+Deliver a pick-up-and-play local brawler where 2 players (scalable to 6) can jump in from Main Menu → Player Count → Character Select → Game with <10 seconds to first match.
+
+Provide rock-solid per-player input using Unity’s Input System: each device controls exactly one character; controller/keyboard navigation works across all menus.
+
+Offer distinct, readable characters (pirate sea creatures) with clear silhouettes and simple move sets: walk, jump, light attack, and heavy attack with fair cooldowns.
+
+Ensure responsive feel: grounded movement/jumps tuned for fast lateral control; consistent gravity and friction; no input lag; stable 60 FPS on modest hardware.
+
+Make the game classroom-friendly and extensible: clean component architecture (PlayerInput, CharacterController, GameState, SceneLoader) that supports adding stages, characters, and attacks without rewrites.
+
+Support accessibility & UX basics: controller-navigable UI, visible focus/hover states, readable TMP text, and enforce minimum 2 players to start.
+
+In scope for this iteration
+
+Two playable characters using the shared controller prefab and per-player device pairing.
+
+Player Count scene (min 2, max 2 for now), Character Select with lock/undo, and a single arena level.
+
+Simple combat via sprite-swap attacks (light/heavy), basic hit timing, and cooldowns.
+
+Minimal HUD (round start text, confirm prompts) and scene transitions.
+
+Out of scope (future work)
+
+Networking/online play, AI opponents, combo systems/hit-stop, VFX/audio polish, progression, and full stage variety.
+
+6.1.2. Hardware, Software, and Human interfaces section
+
+Purpose & Scope. Presents a minimal selector to choose the number of local players before character selection. Enforces minimum 2 players (prototype cap = 2; design scalable to 6).
+
+Screen Composition. Unity uGUI Canvas (Screen Space – Overlay) with:
+
+Lbl_Title (TMP_Text): “Select Players”.
+
+Btn_Decrement (Button) and Btn_Increment (Button) flanking Lbl_Value (TMP_Text) showing the current player count.
+
+Btn_Confirm (Button) and Btn_Back (Button) below the selector.
+
+All buttons use Color Tint highlight + 1.06 scale pop on focus/hover; Navigation set to Explicit.
+
+Input & Navigation. Driven by EventSystem + InputSystemUIInputModule.
+
+Controller (Xbox): D-pad/Left Stick = move focus; A = Activate; B = Back.
+
+Keyboard: Arrow keys/Tab = move focus; Enter/Space = Activate; Esc = Back.
+
+Actions:
+
+Increment: activates Btn_Increment → value++ (clamped to max).
+
+Decrement: activates Btn_Decrement → value-- (clamped to min=2).
+
+Confirm: activates Btn_Confirm only when value ≥ 2.
+
+Back: returns to Main Menu.
+
+Validation & Constraints.
+
+Min = 2 (hard-enforced; pressing decrement at 2 is a no-op with brief disabled tint).
+
+Max = 2 for this iteration (UI clamps; future: expose as config up to 6).
+
+Btn_Confirm.interactable = (value ≥ 2).
+
+State & Interrelation.
+
+On value change: write GameState.NumPlayers = value.
+
+On confirm: SceneLoader.Load("CharacterSelect").
+
+On back: SceneLoader.Load("MainMenu").
+
+Focus & Defaults.
+
+On scene enable: SelectFirstOnEnable.first = Btn_Confirm (so A/Enter can immediately start if already at 2).
+
+Navigation graph: Btn_Decrement ↔ Lbl_Value ↔ Btn_Increment (horizontal), with down to Btn_Confirm, left/right to Btn_Back as explicit links.
+
+Accessibility & Feedback.
+
+TMP font sized for 1080p readability; high-contrast focus tint; disabled buttons gray out at 60% alpha.
+
+Brief 120 ms scale tween on button focus/press; optional tick SFX (future).
+
+Dependencies.
+
+EventSystem with InputSystemUIInputModule (uses default UI action map).
+
+TextMeshPro for labels; no runtime networking or external services.
+
+No sockets/RPC/HTTP/SSL in this scene.
+
+Edge Cases.
+
+If devices disconnect, UI remains operable via remaining devices/keyboard; count persists in GameState.
+
+If GameState.NumPlayers was set previously, the scene initializes Lbl_Value to that value but still enforces min=2/max=2 before enabling Confirm.
+
+<b>6.2. Architectual design section<b>
+
+State Control (Core)
+
+Classes: GameState (static), SceneLoader (static).
+
+Role: Persist NumPlayers and SelectedCharacters; provide centralized scene navigation.
+
+Notes: Pure data + helpers; no Unity lifecycle coupling.
+
+Input & Player Management
+
+Components/Classes: PlayerInputManager (spawns players on join), PlayerInput (per-player device pairing), PlayercontroledInput (reads actions, moves/attacks), PlayerJoinHandler (spawn placement + device lock).
+
+Role: Deterministic per-device control; each player reads only its own InputActionMap instance.
+
+Notes: Resolve actions from GetComponent<PlayerInput>().actions; call SwitchCurrentControlScheme(player.devices) on join.
+
+User Interface Control
+
+Classes: SelectFirstOnEnable, CharacterSelectController, simple menu controllers.
+
+Role: Menu flow and validation (min 2 players), controller/keyboard navigation via EventSystem + InputSystemUIInputModule.
+
+Notes: Explicit button Navigation graphs; UI writes to GameState then calls SceneLoader.
+
+Gameplay (Movement & Combat)
+
+Prefab Composition: character.prefab with Rigidbody2D, Collider2D, SpriteRenderer, PlayerInput, PlayercontroledInput.
+
+Role: Grounded movement, jumping, light/heavy attacks via sprite-swap and cooldowns.
+
+Notes: Physics in FixedUpdate; ground check with OverlapCircle using Ground LayerMask.
+
+Content & Assets
+
+Assets: PlayerActions.inputactions (map gameplay), JoinActions.inputactions (map joining), UI prefabs, spawn markers.
+
+Role: Declarative input bindings and reusable prefabs to reduce code duplication.
+
+Notes: Two control schemes (“KeyBoard and Mouse”, “Xbox Controller”) for menu/gameplay parity.
+
+<b>6.2.1. Major Software Components Section<b>
+
+Below are the major software subsystems of Pirate Fighterz and how each one satisfies the functional requirements 5.2.1 … 5.2.n. This mirrors the SRS functional breakdown and makes coverage explicit.
+
+A) UI Subsystem (Main Menu, Player Count, Character Select, HUD)
+
+Scope. Unity uGUI (Canvas, Button, TMP), EventSystem + InputSystemUIInputModule, explicit Navigation graphs, focus helper (SelectFirstOnEnable).
+
+Responsibilities.
+
+Present navigable menus and enforce constraints (min players = 2; prototype max = 2).
+
+Character Select: lock/undo per player, visible selection badges, confirm gating.
+
+Minimal in-game HUD text.
+
+Satisfies: FR 5.2.1 (start/navigate), 5.2.2 (choose player count with limits), 5.2.3 (unique character selection & confirm), 5.2.8 (HUD prompts), 5.2.12 (controller/keyboard navigable UI).
+
+B) State Control Subsystem (GameState, SceneLoader)
+
+Scope. Static data holder and scene transition utility.
+
+Responsibilities.
+
+Persist NumPlayers, SelectedCharacters across scenes.
+
+Centralize transitions (MainMenu ⇄ PlayerCount ⇄ CharacterSelect ⇄ Game) and quit.
+
+Satisfies: FR 5.2.9 (scene transitions), 5.2.10 (persist selections/values), supports 5.2.1–5.2.3 by carrying state between screens.
+
+C) Input & Player Management Subsystem (PlayerInputManager, PlayerInput, PlayerJoinHandler)
+
+Scope. Unity Input System device pairing and runtime player spawning.
+
+Responsibilities.
+
+Join flow: unpaired device triggers Join → spawn character prefab → bind device to that player.
+
+Place players at spawn points; lock control scheme to the joined device.
+
+Satisfies: FR 5.2.4 (join with controller/keyboard), 5.2.11 (start local 2-player match with distinct inputs).
+
+D) Player Control Subsystem (PlayercontroledInput on character prefab)
+
+Scope. Per-player movement/ability controller; reads the instance action map from that player’s PlayerInput.
+
+Responsibilities.
+
+Movement (A/D or left stick) and jump (W/Space or A button) with ground checks.
+
+Light/heavy attacks (sprite-swap timing + cooldowns).
+
+Ensures no cross-talk between players (actions resolved from the player’s own action asset instance).
+
+Satisfies: FR 5.2.5 (per-player movement/jump), 5.2.6 (attacks & cooldowns), 5.2.11 (independent control per player).
+
+E) Physics & Collision Subsystem (2D Physics)
+
+Scope. Rigidbody2D, Collider2D (capsule/box), layer matrix, ground mask checks.
+
+Responsibilities.
+
+Stable grounded motion, gravity, collision with Ground layer; continuous detection to avoid tunneling.
+
+Grounded test via Physics2D.OverlapCircle with configurable groundMask.
+
+Satisfies: FR 5.2.7 (reliable ground/collision behavior supporting movement/jump/attacks).
+
+F) Content & Assets Subsystem (Actions, Prefabs, Sprites)
+
+Scope. PlayerActions.inputactions (map gameplay: move/jump/attack/heavyAttack), JoinActions.inputactions (map joining: join), character.prefab, spawn markers, sprite sheets.
+
+Responsibilities.
+
+Declarative action bindings for keyboard and Xbox controller schemes.
+
+Reusable prefabs for characters and UI.
+
+Satisfies: Enables FR 5.2.1–5.2.12 by providing the concrete bindings and reusable content used by the above subsystems.
+
+Requirement–Subsystem Trace (concise)
+
+FR 5.2.1 Start/Navigate → UI (A), State/Scene (B)
+
+FR 5.2.2 Choose Player Count (min 2, cap 2 now) → UI (A), State (B)
+
+FR 5.2.3 Unique Character Selection & Confirm → UI (A), State (B)
+
+FR 5.2.4 Join with Controller/Keyboard → Input/Player Mgmt (C)
+
+FR 5.2.5 Per-Player Movement/Jump → Player Control (D), Physics (E)
+
+FR 5.2.6 Light/Heavy Attacks + Cooldowns → Player Control (D)
+
+FR 5.2.7 Ground/Collision Reliability → Physics (E)
+
+FR 5.2.8 Minimal HUD/Prompts → UI (A)
+
+FR 5.2.9 Scene Transitions → State/Scene (B)
+
+FR 5.2.10 Persist Selections/Player Count → State (B)
+
+FR 5.2.11 Two-Player Local Match (independent inputs) → Input/Player Mgmt (C), Player Control (D)
+
+FR 5.2.12 Accessible UI Navigation (controller & keyboard) → UI (A)
+
+This mapping verifies every functional requirement in SRS §5.2 is covered by at least one subsystem, with clear ownership and minimal coupling between concerns.
+
+<b>6.2.2 Major Software Interactions Section<b>
+
+Scope. This section explains how subsystems communicate at runtime—what calls whom, what data crosses boundaries, and which external APIs are involved. 
+No packet formats or per-field details here (those live in Detailed Design).
+
+6.2.2.1 UI ⇄ State ⇄ Scene Flow
+
+UI Controllers → GameState.
+Menu scripts (Main Menu, Player Count, Character Select) write small, immutable values into GameState (e.g., NumPlayers, SelectedCharacters). This is a one-way write at user decision points; no polling.
+
+UI Controllers → SceneLoader.
+When a screen completes its job, it calls SceneLoader.Load("<NextSceneName>"). SceneLoader is a thin façade over Unity’s SceneManager.LoadScene, 
+centralizing navigation so other code doesn’t depend on scene names.
+
+Game Bootstrap → GameState.
+Upon entering Game, a short initializer reads GameState once to determine number of players and chosen characters, then proceeds to player join/spawn (see §6.2.2.3).
+
+6.2.2.2 UI Input vs Gameplay Input (Separation of concerns)
+
+EventSystem + InputSystemUIInputModule (UI path).
+All menu navigation/activation events (focus changes, button clicks) flow through Unity’s UI input module, which consumes a UI action map behind the scenes. 
+This keeps menu input independent from gameplay bindings.
+
+PlayerInput (Gameplay path).
+Each in-game player instance has its own PlayerInput, which owns a per-player instance of the PlayerActions asset. Gameplay actions (move, jump, attack) are read by that player’s controller script only.
+Result: No cross-talk—devices bound to Player 1 cannot drive Player 2, and UI input can be handled/disabled independently of gameplay input.
+
+6.2.2.3 Player Joining & Device Pairing
+
+Devices → JoinActions → PlayerInputManager.
+Any unpaired device (keyboard or gamepad) triggers the joining/join action. Unity’s PlayerInputManager receives that action and instantiates the character prefab.
+
+PlayerInputManager → PlayerInput (new player).
+The spawned prefab’s PlayerInput is auto-paired to the device that triggered joining. From then on, that device’s events are routed only to that PlayerInput’s action map instance.
+
+PlayerInputManager → PlayerJoinHandler.
+playerJoinedEvent passes the new PlayerInput to PlayerJoinHandler, which places the character at the correct spawn transform and (optionally) locks/switches control scheme to the device set for that player.
+
+6.2.2.4 Gameplay Controller ⇄ Physics & Animation
+
+PlayercontroledInput → Rigidbody2D.
+Reads the per-player move vector each frame and writes horizontal velocity in FixedUpdate. On jump and when grounded, it sets vertical velocity. This is a direct component call, not messaging.
+
+PlayercontroledInput → Physics2D.
+Performs a Physics2D.OverlapCircle at the groundCheck transform using the configured groundMask to determine grounded state. No layers are changed at runtime; just a read-only query.
+
+PlayercontroledInput → SpriteRenderer.
+For simple attack feedback, the controller swaps sprites (e.g., walkingStick ↔ swordAttack) on timed coroutines. This stays local to the character; no global event bus is required.
+
+6.2.2.5 Character Select Interactions
+
+CharacterButton → CharacterSelectController.
+Each button invokes TrySelectCharacter(this) on click/submit. The controller updates UI badges, pushes the chosen ID into GameState.SelectedCharacters, and enables Confirm when valid.
+
+CharacterSelectController ↔ EventSystem.
+On undo (controller B/Esc), the controller restores focus to the previously deselected button via EventSystem.SetSelectedGameObject(...), ensuring the user can immediately re-lock with A/Enter.
+
+6.2.2.6 Layering & Collisions (Player ⇄ Ground)
+
+Layer Matrix (Project Settings → Physics 2D).
+Interactions are governed by the Player × Ground collision matrix entry. No runtime code flips collision pairs; configuration ensures deterministic behavior.
+
+Colliders.
+Ground uses BoxCollider2D (non-trigger); player uses CapsuleCollider2D (non-trigger). Collisions are resolved by Unity’s physics engine; the controller only reads grounded state and applies forces/velocities.
+
+6.2.2.7 External APIs / Libraries (integration surface)
+
+Unity Input System (1.14.x).
+
+Interface model: Devices → InputUser → InputActionAsset instances bound to PlayerInput.
+
+Runtime routing: The engine delivers device events to the owning PlayerInput. Scripts subscribe to the instance’s InputAction callbacks (performed/canceled). No custom event bus required.
+
+TextMeshPro (TMP).
+
+Interface model: UI scripts set TMP properties (text, color, enable/disable). No data flows back to gameplay; it’s a one-way presentation layer.
+
+Unity SceneManager.
+
+Interface model: SceneLoader.Load(name) wraps SceneManager.LoadScene(name). No additive scenes in this iteration; single-scene loads reduce coupling.
+
+6.2.2.8 Error & Edge-Case Handling (interaction impacts)
+
+Device disconnects.
+Input System unpairs the device; the owning PlayerInput stops receiving events. UI remains operable with remaining devices/keyboard. Reconnect triggers standard device discovery and can rejoin if allowed.
+
+Invalid UI state.
+Confirm buttons are disabled (interactable=false) until preconditions are met (e.g., NumPlayers ≥ 2, unique selections). This prevents illegal state from propagating to GameState.
+
+Spawn placement.
+PlayerJoinHandler is the single writer of spawn transforms. Movement/physics have no knowledge of spawn logic, keeping those concerns decoupled.
+
+6.2.2.9 Summary (communication map)
+
+UI → State → Scene for decisions and transitions.
+
+Device → PlayerInputManager → PlayerInput → Player Controller for gameplay input.
+
+Controller → Physics2D/Rigidbody2D/SpriteRenderer for motion and feedback.
+
+Buttons → CharacterSelectController → EventSystem focus for selection UX.
+All interactions are narrow and directed, minimizing coupling and making each segment independently testable and replaceable.
+
+<b>6.2.3 Architectural Design Diamgrams section<b>
+
+(Diagrams are in a seperate document!!!!!!)
+
+<b>6.3Detailed CSC and CSU Descriptions Section<b>
+
+CSC-A: UI & Navigation
+
+Purpose: Controller/keyboard-friendly menus, validation, and scene flow.
+
+CSUs:
+
+SelectFirstOnEnable — ensures default UI focus (controller ready).
+
+CharacterSelectController — unique picks, undo, confirm gating, counter text.
+
+CharacterButton — per-character label/badge/interactable logic.
+
+(Lightweight scene scripts for Main Menu, Player Count as needed.)
+
+CSC-B: State & Scene
+
+Purpose: Persist cross-scene decisions; centralize transitions.
+
+CSUs:
+
+GameState — NumPlayers, SelectedCharacters, ResetSelections().
+
+SceneLoader — wraps SceneManager.LoadScene and Quit().
+
+CSC-C: Input & Player Management
+
+Purpose: Runtime player joining, device pairing, spawn placement.
+
+CSUs:
+
+PlayerJoinHandler — handles PlayerInputManager.playerJoinedEvent, sets spawn, optional facing/lock scheme.
+
+(Configured components counted here as interfaces): PlayerInputManager, PlayerInput.
+
+CSC-D: Gameplay Controller
+
+Purpose: Per-player movement, jumping, light/heavy attacks.
+
+CSUs:
+
+PlayercontroledInput — reads its own PlayerInput.actions; writes velocities; ground checks; timed sprite-swap attacks with cooldowns.
+
+CSC-E: Physics & Collision
+
+Purpose: Deterministic collisions/grounding for players and stage.
+
+CSUs:
+
+(Configuration-centric) Ground BoxCollider2D; player Rigidbody2D + CapsuleCollider2D; Physics2D layer matrix and Ground mask.
+
+CSC-F: Content & Bindings
+
+Purpose: Input maps, control schemes, and reusable prefabs/assets.
+
+CSUs:
+
+PlayerActions.inputactions → generated PlayerActions.cs (map gameplay: move, jump, attack, heavyAttack; schemes: Keyboard+Mouse, Xbox Controller).
+
+JoinActions.inputactions (map joining: Join).
+
+character.prefab (SpriteRenderer, Rigidbody2D, Collider2D, PlayerInput, PlayercontroledInput).
+
+<b>6.3.1 Detailed Class Descriptions Section<b>
+
+The following sections provide the details of all classes used in the Pirate Fighterz application. Each subsection documents one class (CSU), ordered roughly from the smallest/most focused utility to the larger, 
+more feature-rich controllers. For every class, we list fields (with purpose) and methods (with behavior), and briefly state why the class exists in the project.
+
+6.3.1.1 SelectFirstOnEnable
+
+Why included. Tiny UI helper that guarantees a sensible default focus target when a menu/screen appears so gamepads work immediately.
+
+Fields
+
+GameObject first — UI element that should receive focus when the object is enabled.
+
+Methods
+
+void OnEnable() — Clears any currently selected UI object and sets first as selected via EventSystem. Prevents “no selection” traps with controllers.
+
+6.3.1.2 SceneLoader (static)
+
+Why included. Single, central place to change scenes or quit; reduces string-literal scattering and simplifies testing.
+
+Fields
+
+(none; static class)
+
+Methods
+
+static void Load(string sceneName) — Wraps SceneManager.LoadScene(sceneName); all scene changes flow through here.
+
+static void Quit() — Exits play (editor or build) with the correct platform-specific behavior.
+
+6.3.1.3 GameState (static)
+
+Why included. Minimal cross-scene state container so UI choices (player count, character picks) are available to the Game scene.
+
+Fields
+
+int NumPlayers — Number of local players chosen on the Player Count screen (min 2 for prototype).
+
+List<string> SelectedCharacters — Ordered list of character IDs picked on Character Select.
+
+Methods
+
+static void ResetSelections() — Clears SelectedCharacters to ensure a clean slate when re-entering selection screens.
+
+6.3.1.4 CharacterButton
+
+Why included. Encapsulates per-button behavior on the Character Select grid: labeling, selection badge, and interactable state.
+
+Fields
+
+string characterId — Canonical ID (e.g., "Octopus", "Crab") used for uniqueness and persistence.
+
+Button button — Unity Button component clicked/submitted by mouse or controller.
+
+TMP_Text label — Text showing the character name.
+
+GameObject selectedBadge — Optional badge shown when selected; may include a TMP child to show P1/P2 tags.
+
+Methods
+
+void Awake() — Wires the click handler and ensures initial deselected UI state.
+
+void SetLabel(string text) — Updates label.text.
+
+void SetSelected(bool on, string tag = "") — Shows/hides selectedBadge, writes tag (e.g., "P1"), and toggles button.interactable.
+
+void OnClick() — Notifies the screen controller (via cached reference) to attempt selection.
+
+6.3.1.5 PlayerJoinHandler
+
+Why included. Receives join events from PlayerInputManager and places new players at spawn points; also performs minor per-player setup.
+
+Fields
+
+Transform leftSpawn — Spawn position for the first player.
+
+Transform rightSpawn — Spawn position for the second player.
+
+int joinCount — Tracks how many players have joined to choose spawn/facing.
+
+Methods
+
+void Awake() — Caches the scene’s PlayerInputManager if needed.
+
+void OnEnable()/OnDisable() — Subscribes/unsubscribes to the manager’s player joined UnityEvent.
+
+void OnPlayerJoined(PlayerInput player) — Positions the new player at the appropriate spawn, optionally flips sprite for P2, and may lock/switch control scheme to the joining device.
+
+6.3.1.6 CharacterSelectController
+
+Why included. Orchestrates the Character Select screen: enforces uniqueness, supports undo, updates counters, and enables Confirm only when valid.
+
+Fields
+
+Button confirmButton — Becomes interactable when at least one (or exactly maxPlayers) selection is made (configurable).
+
+TMP_Text selectedCounterText — Displays “Selected: X/Y” feedback to the user.
+
+CharacterButton btnOctopus, btnCrab, btnStarfish, btnShark, btnTurtle, btnJellyfish — References to all grid buttons.
+
+int maxPlayers — Maximum selections allowed (prototype: 2; scalable to 6).
+
+List<CharacterButton> _all — Convenience list of all buttons for iteration.
+
+Stack<CharacterButton> _history — LIFO history for undo behavior.
+
+int _nextPlayerIndex — Which P# tag to assign to the next successful selection.
+
+Methods
+
+void Start() — Initializes lists, hooks Confirm action (loads Game), resets state, updates counter.
+
+void Update() — Polls for controller undo (e.g., B/Circle) and calls UndoLastSelection() if pressed.
+
+void TrySelectCharacter(CharacterButton btn) — Validates capacity and uniqueness, commits selection (writes to GameState.SelectedCharacters), tags the button, pushes history, updates UI, and toggles Confirm.
+
+void UndoLastSelection() — Pops one selection from history, removes it from GameState, re-enables that button, restores UI focus, and updates counter.
+
+void UpdateSelectedCounter() — Writes "Selected: X/Y" to the TMP label.
+
+6.3.1.7 PlayercontroledInput
+
+Why included. Per-player controller that reads input from that player’s own PlayerInput/actions, applies physics movement, performs ground checks, and drives simple attack visuals.
+
+Fields
+
+Movement/Physics
+
+float moveSpeed — Horizontal speed multiplier for input X.
+
+float jumpForce — Upward velocity set on jump when grounded.
+
+Rigidbody2D rb — Physics body to drive.
+
+Transform groundCheck — Position used for ground probe.
+
+float groundCheckRadius — Radius for OverlapCircle ground test.
+
+LayerMask groundMask — Layers considered “ground.”
+
+bool grounded — Cached result of current ground check.
+
+Input
+
+InputActionReference moveRef/jumpRef/attackRef/heavyAttackRef — Optional serialized refs to actions.
+
+InputAction move/jump/attack/heavyAttack — Resolved actions (from refs or from GetComponent<PlayerInput>().actions).
+
+Vector2 moveInput — Latest movement vector from input.
+
+Visual/Attacks
+
+SpriteRenderer bodyRenderer — Character renderer to swap sprites.
+
+Sprite walkingStick — Idle/neutral pose.
+
+Sprite swordAttack — Light attack frame.
+
+float attackDuration/attackCooldown — Light attack timing.
+
+Sprite[] heavyAttackFrames — Frames for heavy attack.
+
+float heavyAttackFrameDuration/heavyAttackCooldown — Heavy attack timing.
+
+bool isAttacking, canAttack, canHeavyAttack — Runtime gates.
+
+Methods
+
+void Awake() — Resolves InputActions (prefer serialized refs; fall back to this instance’s PlayerInput.actions), subscribes to action callbacks.
+
+void OnEnable()/OnDisable() — Enables/disables resolved actions.
+
+void Update() — Performs ground probe with Physics2D.OverlapCircle.
+
+void FixedUpdate() — Applies horizontal velocity from moveInput.x; jump sets vertical velocity when grounded.
+
+void TryAttack() — Starts light-attack coroutine if allowed.
+
+IEnumerator DoAttack() — Swaps sprite to swordAttack, waits attackDuration, restores, waits cooldown.
+
+void TryHeavyAttack() — Starts heavy-attack coroutine if allowed.
+
+IEnumerator DoHeavyAttack() — Iterates heavyAttackFrames with per-frame waits, restores, then cooldown.
+
+void OnDrawGizmosSelected() — Visualizes ground probe radius in the Scene view (editor aid).
+
+<b>6.3.2. Detailed Interface Descriptions Section<b>
+
+This section, and its sub-sections, describe the interfaces in each of the CSUs of the project. Follow the same guidelines as described in the paragraphs above, only for interfaces rather than classes.
+
+And by the way, in this context the term interfaces doesn't mean " Java's interfaces"; instead it describes how the different software subsystems transmit 
+or receive data from each other or pass control around amongst each other,
+must like you can refer to talking with a fellow student or a coworker as "verbal interfacing".
+
+<b>6.3.3. Detailed data structure descriptions section<b>
+
+This section specifies the core algorithms used by the CSUs in §6.3.1 and the data structures in §6.3.2. For each routine, we include pre/postconditions, side effects, and concise pseudocode to make behavior unambiguous.
+
+6.3.3.1 Character Selection (CharacterSelectController.TrySelectCharacter)
+
+Purpose. Commit a pick if capacity and uniqueness constraints are satisfied.
+
+Preconditions
+
+btn.Id is a valid character ID.
+
+0 ≤ SelectedCharacters.Count ≤ maxPlayers.
+
+Postconditions
+
+If accepted: btn.Id ∈ SelectedCharacters at the tail; _history.Top == btn; _nextPlayerIndex increments by 1; UI counter updated; Confirm enabled iff SelectedCharacters.Count ≥ 1 (prototype) or == maxPlayers (strict mode).
+
+Pseudocode
+
+if _nextPlayerIndex >= maxPlayers: return
+if btn.Id in GameState.SelectedCharacters: return
+
+GameState.SelectedCharacters.append(btn.Id)
+_history.push(btn)
+btn.SetSelected(true, "P" + (_nextPlayerIndex+1))
+_nextPlayerIndex += 1
+
+confirmButton.interactable = (SelectedCharacters.Count ≥ 1)  // or == maxPlayers
+UpdateSelectedCounter()
+
+
+Side effects
+
+Mutates UI (badge/interactable, counter, confirm state).
+
+Mutates GameState.SelectedCharacters, _history, _nextPlayerIndex.
+
+6.3.3.2 Undo Selection (CharacterSelectController.UndoLastSelection)
+
+Purpose. Revert the most recent selection (single-step LIFO).
+
+Preconditions
+
+_history.Count > 0.
+
+Tail of SelectedCharacters equals _history.Top.Id.
+
+Postconditions
+
+Tail element removed from SelectedCharacters; _nextPlayerIndex decremented (not below 0); button re-enabled and deselected; UI focus restored to that button.
+
+Pseudocode
+
+if _history.empty(): return
+last = _history.pop()
+remove tail from GameState.SelectedCharacters (must equal last.Id)
+
+last.SetSelected(false, "")
+_nextPlayerIndex = max(0, _nextPlayerIndex - 1)
+
+EventSystem.SetSelectedGameObject(last.ButtonGameObject)
+
+confirmButton.interactable = (SelectedCharacters.Count == maxPlayers)  // if strict
+UpdateSelectedCounter()
+
+6.3.3.3 Player Join & Device Pairing (PlayerJoinHandler.OnPlayerJoined)
+
+Purpose. Place new player at a seat and bind the control scheme/devices.
+
+Preconditions
+
+Invoked by PlayerInputManager.playerJoinedEvent.
+
+player has a PlayerInput component; leftSpawn/rightSpawn assigned for seats 0/1.
+
+Postconditions
+
+Player transform positioned; sprite orientation set (optional flip for P2);
+
+Control scheme locked to the joined device set.
+
+Pseudocode
+
+seat = currentJoinCount
+if seat == 0: player.transform.position = leftSpawn.position
+if seat == 1: player.transform.position = rightSpawn.position
+
+if seat == 1: flip player.SpriteRenderer horizontally
+
+devices = player.devices                  // provided by Input System
+scheme  = player.currentControlScheme     // inferred by Input System
+player.SwitchCurrentControlScheme(scheme, devices)
+
+currentJoinCount += 1
+
+6.3.3.4 Per-Player Action Resolution (PlayercontroledInput.Awake)
+
+Purpose. Resolve InputActions for this specific player instance.
+
+Preconditions
+
+PlayerInput exists on the same GameObject.
+
+PlayerInput.actions contains map gameplay.
+
+Postconditions
+
+move/jump/attack/heavyAttack actions are assigned and subscribed.
+
+Pseudocode
+
+actions = GetComponent<PlayerInput>().actions
+move        = moveRef ? moveRef.action : actions["move"]
+jump        = jumpRef ? jumpRef.action : actions["jump"]
+attack      = attackRef ? attackRef.action : actions["attack"]
+heavyAttack = heavyAttackRef ? heavyAttackRef.action : actions["heavyAttack"]
+
+move.performed  += (ctx) => moveInput = ctx.ReadValue<Vector2>()
+move.canceled   += (_)   => moveInput = Vector2.zero
+jump.performed  += (_)   => if grounded: rb.linearVelocity.y = jumpForce
+attack.performed+= (_)   => TryAttack()
+heavyAttack.performed += (_) => TryHeavyAttack()
+
+6.3.3.5 Movement Loop (Physics)
+
+Purpose. Apply horizontal velocity deterministically; gate jump by grounded.
+
+Preconditions
+
+rb assigned; moveInput updated via input callbacks.
+
+Postconditions
+
+rb.linearVelocity.x == moveInput.x * moveSpeed;
+
+Vertical velocity set by jump callback only when grounded == true.
+
+Pseudocode
+
+Update():
+  grounded = OverlapCircle(groundCheck.pos, groundCheckRadius, groundMask)
+
+FixedUpdate():
+  vx = moveInput.x * moveSpeed
+  rb.linearVelocity = (vx, rb.linearVelocity.y)
+
+
+Side effects
+
+Writes to Rigidbody2D.linearVelocity.
+
+6.3.3.6 Light/Heavy Attack Timelines
+
+Light Attack (TryAttack / DoAttack)
+
+Pre: canAttack && !isAttacking && bodyRenderer && swordAttack.
+
+Post: Sprite swapped to swordAttack for attackDuration, then restored; canAttack false during attack+cooldown.
+
+Pseudocode
+
+if !canAttack or isAttacking: return
+canAttack = false; isAttacking = true
+prev = bodyRenderer.sprite
+bodyRenderer.sprite = swordAttack
+wait attackDuration
+bodyRenderer.sprite = walkingStick ?? prev
+isAttacking = false
+wait attackCooldown
+canAttack = true
+
+
+Heavy Attack (TryHeavyAttack / DoHeavyAttack)
+
+Pre: canHeavyAttack && !isAttacking && heavyAttackFrames.Length > 0.
+
+Post: Iterate frames with heavyAttackFrameDuration, restore, then cooldown.
+
+Pseudocode
+
+if !canHeavyAttack or isAttacking: return
+canHeavyAttack = false; isAttacking = true
+prev = bodyRenderer.sprite
+for frame in heavyAttackFrames:
+  bodyRenderer.sprite = frame
+  wait heavyAttackFrameDuration
+bodyRenderer.sprite = walkingStick ?? prev
+isAttacking = false
+wait heavyAttackCooldown
+canHeavyAttack = true
+
+6.3.3.7 Ground Detection Probe
+
+Purpose. Stable, layer-based grounded test used by jump gating.
+
+Preconditions
+
+groundCheck assigned; groundMask includes only “Ground”.
+
+Postconditions
+
+grounded == true iff probe circle intersects any collider on groundMask.
+
+Pseudocode
+
+grounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundMask) != null
+
+
+Invariants
+
+groundCheckRadius > 0.
+
+6.3.3.8 UI Focus Restore (Undo)
+
+Purpose. After undo, immediately place focus back on the re-enabled button so the player can confirm again with A/Enter.
+
+Preconditions
+
+The undone CharacterButton exists and is interactable after undo.
+
+Postconditions
+
+EventSystem.current.currentSelectedGameObject == lastButtonGO.
+
+Pseudocode
+
+go = last.GetComponent<Button>()?.gameObject ?? last.gameObject
+EventSystem.current.SetSelectedGameObject(null)
+EventSystem.current.SetSelectedGameObject(go)
+
+
+Notes on correctness & race-conditions
+
+All UI mutations occur on main thread (Unity constraint).
+
+Attack coroutines serialize via isAttacking flag to prevent overlap.
+
+Device pairing is sealed at join time by SwitchCurrentControlScheme(devices), preventing cross-control.
+
+<b>6.3.4. Detailed Design Diagrams Section<b>
+
+(Also in another document!!!)
+
+<b>6.4. Database Design and Description Section<b>
+
+NO DATABASE
