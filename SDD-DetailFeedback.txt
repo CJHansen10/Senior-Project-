@@ -1,0 +1,109 @@
+
+Documentation Feedback ~ Deliverable #4
+Software Design Document ~ Detailed Design
+CMSI 4071 Fall 2025
+==========================================
+
+DETAILED CSC AND CSU DESCRIPTIONS:
+   Strengths
+      Clear CSC breakdown: The document identifies six Component Subsystems
+         (CSCs), each with a well-defined purpose and associated Component
+         Subsystem Units (CSUs).
+      Unity-specific clarity: The use of Unity components
+         (e.g., PlayerInputManager, SceneLoader, CharacterSelectController)
+         is well-integrated and explained.
+      Scalability awareness: Notes on scalability (e.g., 2 to 6 players) are
+         present, showing foresight in design.
+   Suggestions
+      Add rationale for CSU grouping: While the CSCs are well-organized, a
+         brief explanation of why certain CSUs are grouped together would
+         help clarify design decisions.
+      Include more lightweight scene scripts: The document mentions
+         lightweight scripts for Main Menu and Player Count but doesn't
+            detail them. Even brief outlines would improve completeness.
+
+DETAILED CLASS DESCRIPTIONS:
+   Strengths
+      Comprehensive coverage: Each class includes purpose, fields, methods,
+         and behavioral descriptions.
+      Unity lifecycle awareness: Methods like Awake, OnEnable, FixedUpdate,
+         and Update are clearly described with their roles.
+      Input handling clarity: The PlayercontroledInput class shows excellent
+         detail in how input actions are resolved and used.
+   Suggestions
+      Add access modifiers: While fields and methods are listed, specifying
+         public, private, or protected would clarify encapsulation.
+      Include class relationships: Mentioning inheritance or composition
+         (e.g., which classes use or extend others) would help understand
+         the object model.
+      Expand on error handling: Some classes (e.g., PlayerJoinHandler) could
+         benefit from notes on how they handle unexpected states or failures.
+
+DETAILED INTERFACE DESCRIPTIONS:
+   Strengths
+      Clarifies subsystem communication: The section explains how CSUs
+         interact, focusing on control and data flow.
+      Avoids confusion with language-specific interfaces: The document
+         correctly clarifies that “interface” refers to interaction points,
+         not Java/C# interfaces.
+   Suggestions
+      Add examples of interface usage: Including snippets or pseudocode
+         showing how one CSU calls another would enhance clarity.
+      Include data formats or types: While control flow is described,
+         specifying the data types or structures passed between CSUs would
+         improve precision.
+
+DETAILED DATA STRUCTURE DESCRIPTIONS:
+   Strengths
+      Excellent use of pseudocode: Each algorithm is described with
+         preconditions, postconditions, side effects, and pseudocode.
+      Covers key routines: Includes character selection, undo, player
+         joining, input resolution, movement, attacks, and UI focus.
+      Unity-specific behavior: Notes on Unity constraints (e.g., main thread
+         UI mutations, coroutine serialization) show practical awareness.
+   Suggestions
+      Add data structure diagrams: Visual representations of key data
+         structures (e.g., GameState, SelectedCharacters, _history) would
+         aid understanding.
+      Clarify edge cases: Some routines (e.g., TrySelectCharacter) could
+         benefit from more explicit handling of invalid inputs or race
+         conditions.
+
+DETAILED DESIGN DIAGRAMS:
+   Strengths
+      The document acknowledges that diagrams are in a separate document,
+         showing awareness of their importance.
+   Suggestions
+      Include diagram summaries or references: Even if diagrams are external,
+         brief descriptions or references (e.g., "Figure 1: Class
+         Relationships") would improve completeness.
+      Ensure alignment with textual descriptions: When reviewing the diagram
+         document, verify that it matches the classes and interactions
+         described in 6.3.1–6.3.3.
+
+DATABASE DESIGN AND DESCRIPTION:
+   Not Applicable [2 free points]
+
+
+----------------------------------------------
+OVERALL ASSESSMENT:
+   Category                          Points
+   CSC/CSU Descriptions:                2 of  2
+   Class Descriptions:                  3 of  3
+   Interface Descriptions:              3 of  3
+   Data structure Descriptions:         1 of  1
+   Design diagrams:                     4 of  4
+   Database design/descriptions:        2 of  2
+                                     ===========
+   Subtotal                            15 of 15
+   ------------------------------------------------------
+   Total Percentage:  15/15 = 100% which is an A-plus
+
+
+Overall Completeness Assessment at the Detailed Design Level
+   The document is very complete and well-structured, especially for an Agile
+   or Waterfall SDD. It:
+      Clearly defines all CSCs and CSUs.
+      Provides detailed class and method descriptions.
+      Includes interaction and data structure explanations.
+      Uses Unity-specific terminology and lifecycle methods effectively.

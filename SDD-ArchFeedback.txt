@@ -1,0 +1,103 @@
+
+Documentation Feedback ~ Deliverable #4
+Software Design Document ~ Architecture
+CMSI 4071 Fall 2025
+=======================================
+
+INTRODUCTION SECTION:
+   System objectives section
+   Hardware, software, and human interfaces section
+Strengths
+   Clear subsystem breakdown: The document identifies six major subsystems
+      (UI, State Control, Input & Player Management, Player Control,
+      Physics & Collision, Content & Assets), each with scope,
+      responsibilities, and functional requirement mappings.
+   Traceability: The mapping of functional requirements (FR 5.2.x) to
+      subsystems is thorough and explicit, ensuring coverage and
+      accountability.
+   Low coupling: The design emphasizes narrow, directed interactions between
+      components, which supports modularity and testability.
+   Unity-specific clarity: The use of Unity components (e.g., PlayerInput,
+      SceneLoader, EventSystem) is well-documented, showing practical
+      integration with the engine.
+Suggestions
+   Add diagrams inline or reference them more clearly: While the document
+      mentions that diagrams are in a separate document, a placeholder or
+      summary of what each diagram shows would improve readability and
+      completeness.
+   Include rationale for architectural choices: While the design is clean, a
+      brief justification for why certain patterns (e.g., static GameState,
+      prefab-based composition) were chosen would enhance understanding.
+
+ARCHITECTURAL DESIGN SECTION:
+   Major softwre components section
+      Strengths
+         Subsystem-centric organization: Each component is grouped logically
+            under its subsystem, with clear responsibilities and mappings to
+            functional requirements.
+         Unity integration: The use of Unity-specific systems
+            (e.g., InputSystemUIInputModule, PlayerInputManager) is
+            well-explained.
+         Scalability considerations: The document notes prototype constraints
+            (e.g., 2 players) and how the design can scale to 6 players.
+      Suggestions
+         Add component diagrams or class relationships: Visualizing how
+            components relate (e.g., inheritance, composition) would help
+            clarify the architecture.
+         Expand on error handling: While some edge cases are mentioned, a more
+            systematic approach to error handling across components (e.g.,
+               what happens if PlayerInputManager fails to spawn a player?)
+               would strengthen robustness.
+   Major software interactions section
+      Strengths
+         Runtime flow clarity: The document clearly explains how data and
+            control flow between subsystems during runtime.
+         Separation of concerns: UI input and gameplay input are distinctly
+            separated, which is a best practice in game development.
+         Interaction summaries: Each interaction (e.g., UI, State, Scene,
+            Player Join & Device Pairing) is described with purpose, flow,
+            and Unity API usage.
+      Suggestions
+         Add sequence diagrams or flowcharts: These would visually reinforce
+            the described interactions and help readers quickly grasp the flow.
+         Clarify external API dependencies: While Unity APIs are listed, a
+            brief note on version compatibility or known limitations would be
+               helpful for maintainability.
+   Architectural design diagrams section
+      Strengths
+         The document acknowledges the importance of diagrams and states they
+            are in a separate document.
+      Suggestions
+         Include diagram summaries or thumbnails: Even if the full diagrams
+            are in another document, a brief description or reference to their
+            content (e.g., "Figure 1: UI Flow", "Figure 2: Player Join Sequence")
+            would improve completeness.
+         Ensure diagrams match described interactions: When reviewing the
+            separate diagram document, verify that it aligns with the
+            interactions and components described in 6.2 and 6.2.2.
+
+OVERALL ASSESSMENT:
+   Category                          Points
+   INTRODUCTION                         1
+   System objectives                    1
+   H/W, S/W, Human I/F                  1
+
+   ARCHITECTURAL DESIGN SECTION:
+   Major softwre components             1
+   Major software interactions          1
+   Architectural design diagrams        5
+
+                                     ======
+   Subtotal                            10
+   ------------------------------------------------------
+   Total Percentage:  10/10 = 100% which is an A-plus
+
+Overall Completeness Assessment
+The document is highly complete at the architectural design level for an
+   Agile or Waterfall SDD. It:
+      Covers all required sections with depth.
+      Maps functional requirements to components.
+      Describes runtime interactions and subsystem responsibilities.
+      Uses Unity-specific terminology and APIs effectively.
+
+Nice job ~ on to the detailed design!
